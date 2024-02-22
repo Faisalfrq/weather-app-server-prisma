@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Administrator {
+  id            String    @id @default(cuid())
+  name          String?
+  username      String?
+  password      String?
+  isActive      Boolean   @default(true)
+  isDeleted     Boolean   @default(false)
+  sms_number    String?   @unique
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  organization  String?
+  roleId        String?
+  role          Role?     @relation(fields: [roleId], references: [id])
+  Account       Account[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String        @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?       @db.Text
+  access_token      String?       @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?       @db.Text
+  session_state     String?
+  user              Administrator @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@unique([provider, providerAccountId])
+}
+
+model Role {
+  id             String          @id @default(uuid())
+  name           String
+  administrators Administrator[] // One-to-many relationship
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model SiteType {
+  id        String   @id @default(uuid())
+  name      String
+  Site      Site[] // One-to-many relationship
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Site {
+  id            String          @id @default(uuid())
+  name          String
+  latitude      Float
+  longitude     Float
+  altitude      Float
+  city          String
+  district      String
+  province      String
+  country       String
+  typeId        String? // Optional typeId field
+  type          SiteType?       @relation(fields: [typeId], references: [id])
+  subscriptions Subscriptions[]
+  alertLogs     AlertLogs[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Subscriptions {
+  id        String   @id @default(uuid())
+  isActive  Boolean
+  siteId    String? // Optional site_id field
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  userId    String? // Optional id field
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  sms_number    String          @unique
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  isActive      Boolean         @default(true)
+  designation   String?
+  organization  String?
+  Subscriptions Subscriptions[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model AlertLogs {
+  id          String    @id @default(uuid())
+  message     String
+  alertTypeId String
+  alertType   AlertType @relation(fields: [alertTypeId], references: [id])
+  siteId      String?
+  site        Site?     @relation(fields: [siteId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AlertType {
+  id        String      @id @default(uuid())
+  name      String
+  alertLogs AlertLogs[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model EmailTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MessageTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
