@@ -1,6 +1,6 @@
 //index.js
 import express from 'express' 
-import { AppRoutes } from './controllers';
+import { AppRoutes } from './src/controllers';
 const app = express();
 const PORT = process.env.PORT || 3002;
 
