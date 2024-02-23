@@ -1,2 +1,2 @@
 
-export const userServices = require("./sites");
+module.exports = require("./sites");

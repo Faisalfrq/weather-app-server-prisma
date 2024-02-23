@@ -1,6 +1,6 @@
 
-import { userServices } from "../../../services";
+const userServices=require("../../../services/index.ts")
 
-export const getSites = async (req:any, res:any) => {
+module.exports = async (req:any, res:any) => {
   return await userServices.getSites(req, res);
 };

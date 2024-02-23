@@ -1,5 +1,5 @@
 import express from "express"
-import { user } from "./user";
+const user = require("./user/index.ts")
 const routes = express.Router();
 
 module.exports = () => {
