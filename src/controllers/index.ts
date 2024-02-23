@@ -2,7 +2,7 @@ import express from "express"
 import { user } from "./user";
 const routes = express.Router();
 
-export const AppRoutes = () => {
+module.exports = () => {
   routes.use("/user", user());
   return routes;
 };
