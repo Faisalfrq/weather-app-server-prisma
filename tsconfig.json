@@ -16,7 +16,8 @@
     "esModuleInterop": true,                            /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
     "forceConsistentCasingInFileNames": true,          
     "strict": true,                  
-    "skipLibCheck": true                              
+    "skipLibCheck": true  ,
+    "outDir": "dist"                            
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
