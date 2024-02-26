@@ -1,6 +1,6 @@
 //index.js
 import express from "express";
-const routes = require("./src/controllers/index.ts")
+const routes = require("./src/controllers")
 const app = express();
 const PORT = process.env.PORT || 3002;
 

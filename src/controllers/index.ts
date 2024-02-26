@@ -1,5 +1,5 @@
 import express from "express"
-const user = require("./user/index.ts")
+const user = require("./user")
 const routes = express.Router();
 
 module.exports = () => {
