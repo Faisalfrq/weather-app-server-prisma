@@ -5,12 +5,12 @@
     /* Projects */
     "incremental": true,                
     "target": "ES5",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "lib": [],         
+    // "lib": [],         
     "module": "commonjs",                                    /* Specify the root folder within your source files. */
     "moduleResolution": "node10" ,                        /* Conditions to set in addition to the resolver-specific defaults when resolving imports. */
     "resolveJsonModule": true,  
     "allowJs": true,                                      /* Disable emitting comments. */
-    "noEmit": true,                                   /* Disable emitting files from a compilation. */
+    "noEmit": false,                                   /* Disable emitting files from a compilation. */
     
     "isolatedModules": true,                        
     "esModuleInterop": true,                            /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
