@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 //index.js
-var express_1 = require("express");
+var express = require("express");
 var routes = require("./src/controllers/index.ts");
-var app = (0, express_1.default)();
+var app = express();
 var PORT = process.env.PORT || 3002;
 app.use(routes());
 // Start the server
