@@ -1,5 +1,5 @@
-import express from "express"
-const getSites = require("./sites/getSites.ts")
+const express= require("express");
+import { getSites } from "./sites/getSites";
 const routes = express.Router();
 
 module.exports = () => {
