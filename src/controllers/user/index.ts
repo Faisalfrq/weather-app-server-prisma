@@ -1,4 +1,4 @@
-const express= require("express");
+import express from "express"
 import { getSites } from "./sites/getSites";
 const routes = express.Router();
 
