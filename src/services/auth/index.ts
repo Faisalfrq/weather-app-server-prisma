@@ -74,56 +74,11 @@ export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
 };
 
 
-// Function to handle the first step of the login process (sending OTP)
-export const login = async (req: Request, res: Response) => {
-    const { sms_number } = req.body;
-
+export const getUserById = async (req: Request, res: Response) => {
     try {
-        // Check if the user with the provided SMS number exists in the database
-        const existingUser = await db.user.findUnique({ where: { sms_number } });
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found with this mobile number" });
-        }
-
-        // Generate OTP and send to the user's SMS number
-        await generateOTP(sms_number);
-        
-        // Send response indicating OTP has been sent
-        return res.status(200).json({ message: "OTP has been sent to your mobile number. Please confirm OTP to complete login." });
-    } catch (error) {
-        return res.status(500).json({ message: (error as Error).message });
-    }
-};
-
-// Function to handle the second step of the login process (confirming OTP and logging in)
-export const confirmOTPAndLogin = async (req: Request, res: Response) => {
-    const { sms_number, otp } = req.body;
-
-    try {
-        // Verify OTP
-        if (otp !== staticOTP) {
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-
-        // Find user by SMS number
-        const user = await db.user.findUnique({ where: { sms_number } });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // User is authenticated, you can proceed with creating session/token
-        // For simplicity, let's just return the user information
-        return res.status(200).json({ message: "Login successful", user });
-    } catch (error) {
-        return res.status(500).json({ message: (error as Error).message });
-    }
-};
-
-
-export const getUsers = async (req: Request, res: Response) => {
-    try {
+        let id = "clt43m2l80000byfczmzptzu7"
         // Fetch all users from the database
-        const users = await db.user.findMany();
+        const users = await db.user.findUnique({where:{id},include:{Subscriptions:true} });
 
         // Return the list of users
         return res.status(200).json({ message: "Users retrieved successfully", users });

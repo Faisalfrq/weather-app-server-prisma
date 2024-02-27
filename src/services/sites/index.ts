@@ -57,31 +57,17 @@ export const unsubscribeFromSite = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User is not subscribed to this site' });
     }
 
-    // Delete the subscription
-    await db.subscriptions.delete({
+    // Update the subscription to set isActive to false
+    await db.subscriptions.update({
       where: {
         id: existingSubscription.id
+      },
+      data: {
+        isActive: false
       }
     });
 
     return res.status(200).json({ message: 'Unsubscription successful' });
-  } catch (error) {
-    return res.status(500).json({ message: (error as Error).message });
-  }
-};
-
-export const getSubscriptionsByUser = async (req: Request, res: Response) => {
-  const userId = req.query.userId as string;
-
-  try {
-    // Find subscriptions for the given user ID
-    const subscriptions = await db.subscriptions.findMany({
-      where: {
-        userId: userId
-      }
-    });
-
-    return res.status(200).json({ message: 'Subscriptions retrieved successfully', subscriptions });
   } catch (error) {
     return res.status(500).json({ message: (error as Error).message });
   }
