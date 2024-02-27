@@ -5,7 +5,7 @@ import { db } from "../../lib/db";
 const staticOTP = "123456"; // Static 6-digit OTP for testing
 
 // Map to store pending signups awaiting OTP confirmation
-const pendingSignUps: Record<string, { name: string; sms_number: string }> = {};
+const pendingSignUps: Record<string, { sms_number: string }> = {};
 
 // Function to simulate OTP generation and sending
 const generateOTP = async (contact: string) => {
@@ -16,20 +16,18 @@ const generateOTP = async (contact: string) => {
 
 // Function to handle user sign-up request
 export const signUp = async (req: Request, res: Response) => {
-    const { name, sms_number } = req.body;
+    const { sms_number } = req.body;
 
     try {
+        await generateOTP(sms_number);
         // Check if the provided SMS number already exists in the database
         const existingUser = await db.user.findUnique({ where: { sms_number } });
         if (existingUser) {
-            return res.status(400).json({ message: "User already exists with this mobile number" });
+            return res.status(400).json({ message: "You already have an account, confirm otp and continue" });
         }
 
-        // Generate OTP and send to the user
-        await generateOTP(sms_number);
-        
         // Store user information temporarily until OTP confirmation
-        pendingSignUps[sms_number] = { name, sms_number };
+        pendingSignUps[sms_number] = { sms_number };
 
         // Send response indicating OTP has been sent
         return res.status(200).json({ message: "OTP has been sent to your mobile number. Please confirm OTP to complete signup." });
@@ -46,7 +44,12 @@ export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
         // Check if there is a pending signup with the provided SMS number
         const pendingSignUp = pendingSignUps[sms_number];
         if (!pendingSignUp) {
-            return res.status(404).json({ message: "No pending signup found for this mobile number." });
+            // If no pending signup found, confirm OTP and show message login successful
+            if (otp === staticOTP) {
+                return res.status(200).json({ message: "Login successful" });
+            } else {
+                return res.status(400).json({ message: "Invalid OTP" });
+            }
         }
 
         // Verify OTP
@@ -57,7 +60,6 @@ export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
         // Store user information in the database
         const newUser = await db.user.create({
             data: {
-                name: pendingSignUp.name,
                 sms_number: pendingSignUp.sms_number,
                 isActive: true // Assuming the user is active by default after signup
             }
@@ -72,6 +74,7 @@ export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
         return res.status(500).json({ message: (error as Error).message });
     }
 };
+
 
 
 export const getUserById = async (req: Request, res: Response) => {
