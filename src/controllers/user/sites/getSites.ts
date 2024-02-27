@@ -1,6 +1,6 @@
 
-import { userServices } from "../../../services";
+import { siteServices } from "../../../services";
 
 export const getSites = async (req:any, res:any) => {
-  return await userServices.getSites(req, res);
+  return await siteServices.getSites(req, res);
 };
