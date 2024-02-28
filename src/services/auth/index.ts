@@ -2,9 +2,6 @@ import { Request, Response } from 'express';
 import { db } from "../../lib/db";
 import jwt, { Secret } from "jsonwebtoken"
 
-interface CustomRequest extends Request {
-    user?: { id: string }; // Define the user property with an ID
-}
 // Simulated OTP for testing
 const staticOTP = "123456"; // Static 6-digit OTP for testing
 
@@ -32,16 +29,19 @@ export const signUp = async (req: Request, res: Response) => {
         await generateOTP(sms_number);
         const existingUser = await db.user.findUnique({ where: { sms_number } });
         if (existingUser) {
-            return res.status(400).json({ message: "You already have an account, confirm otp and continue" });
+            // User already exists
+            return res.status(200).json({ message: "You already have an account, confirm otp and continue" });
         }
 
         pendingSignUps[sms_number] = { sms_number };
 
+        // New signup
         return res.status(200).json({ message: "OTP has been sent to your mobile number. Please confirm OTP to complete signup." });
     } catch (error) {
         return res.status(500).json({ message: (error as Error).message });
     }
 };
+
 
 // Function to handle OTP confirmation and complete signup process
 export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
@@ -95,6 +95,19 @@ export const getUserById = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found" });
         }
         return res.status(200).json({ user: user });
+    } catch (err) {
+        console.log("Something went wrong: " + (err as Error).message);
+        return res.status(500).json({ error: "Server error" });
+    }
+};
+
+export const getUsers = async (req: Request, res: Response) => {
+    try {
+        // Fetch all users from the database
+        const users = await db.user.findMany();
+
+        // Return the list of users in the response
+        return res.status(200).json({ users: users });
     } catch (err) {
         console.log("Something went wrong: " + (err as Error).message);
         return res.status(500).json({ error: "Server error" });
