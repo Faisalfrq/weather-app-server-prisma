@@ -18,6 +18,6 @@ module.exports = () => {
   routes.get("/site",userMiddleware, getSites);
   routes.post("/subscribe", subscribeSite);
   routes.post("/unsubscribe", unsubscribeSite);
-  routes.get("/notifications", getNotifications);
+  routes.get("/notifications",userMiddleware, getNotifications);
   return routes;
 };
