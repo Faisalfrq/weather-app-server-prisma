@@ -31,6 +31,26 @@ export const getNotificationsByUserId = async (req: Request, res: Response) => {
   }
 };
 
+export const updateNotificationById = async (req: Request, res: Response) => {
+  try {
+    const { notificationId } = req.body;
+
+    // Update notification with the given ID and set isRead to true
+    const updatedNotification = await db.notification.update({
+      where: {
+        id: notificationId
+      },
+      data: {
+        isRead: true
+      }
+    });
+
+    return res.status(200).json({ message: 'Notification updated successfully', notification: updatedNotification });
+  } catch (error) {
+    return res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 let lastNotificationTimestamp: Date | null = null;
 
 // Function to poll for new notifications and emit only the latest one to clients

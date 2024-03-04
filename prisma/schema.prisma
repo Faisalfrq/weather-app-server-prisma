@@ -9,9 +9,9 @@ generator client {
 //   url      = env("DATABASE_URL")
 // }
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model Administrator {

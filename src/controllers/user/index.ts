@@ -8,6 +8,7 @@ import { getNotifications } from "./notifications/getNotifications";
 import { getUserById } from "./auth/getUserById";
 import userMiddleware from "../../middlewares/user.auth";
 import { getUsers } from "../../services/auth";
+import { updateNotificationById } from "./notifications/updateNotification";
 const routes = express.Router();
 
 module.exports = () => {
@@ -19,5 +20,6 @@ module.exports = () => {
   routes.post("/subscribe", subscribeSite);
   routes.post("/unsubscribe", unsubscribeSite);
   routes.get("/notifications",userMiddleware, getNotifications);
+  routes.put("/notifications",userMiddleware, updateNotificationById);
   return routes;
 };
