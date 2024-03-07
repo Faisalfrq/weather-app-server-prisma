@@ -36,14 +36,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSites = void 0;
-var services_1 = require("../../../services");
-var getSites = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.getAllNotifications = void 0;
+var db_1 = require("../../lib/db"); // Import existing Prisma client instance
+var getAllNotifications = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var notifications, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, services_1.siteServices.getSites(req, res)];
-            case 1: return [2 /*return*/, _a.sent()];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, db_1.db.notification.findMany()];
+            case 1:
+                notifications = _a.sent();
+                return [2 /*return*/, res.status(200).json({ message: 'All notifications retrieved successfully', notifications: notifications })];
+            case 2:
+                error_1 = _a.sent();
+                return [2 /*return*/, res.status(500).json({ message: error_1.message })];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-exports.getSites = getSites;
+exports.getAllNotifications = getAllNotifications;

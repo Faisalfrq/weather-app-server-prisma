@@ -36,14 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSites = void 0;
+exports.registerUser = void 0;
 var services_1 = require("../../../services");
-var getSites = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var registerUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, services_1.siteServices.getSites(req, res)];
+            case 0: return [4 /*yield*/, services_1.authServices.signUp(req, res)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });
 }); };
-exports.getSites = getSites;
+exports.registerUser = registerUser;

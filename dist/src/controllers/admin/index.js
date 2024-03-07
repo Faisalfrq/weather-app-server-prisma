@@ -4,13 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var user = require("./user");
-var admin = require("./admin");
+var getAdminNotifications_1 = require("./notifications/getAdminNotifications");
 var routes = express_1.default.Router();
 module.exports = function () {
-    routes.use("/user", user());
-    routes.use("/admin", admin());
+    routes.get("/notifications", getAdminNotifications_1.getAllNotifications);
     return routes;
 };
-// ? http://localhost:4000/trainee/assignments
-// paths

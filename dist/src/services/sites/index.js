@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSites = void 0;
+exports.unsubscribeFromSite = exports.subscribeToSite = exports.getSites = void 0;
 var db_1 = require("../../lib/db");
 var getSites = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var sites, error_1;
@@ -56,3 +56,82 @@ var getSites = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
     });
 }); };
 exports.getSites = getSites;
+var subscribeToSite = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, userId, siteId, existingSubscription, newSubscription, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, userId = _a.userId, siteId = _a.siteId;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, db_1.db.subscriptions.findFirst({
+                        where: {
+                            userId: userId,
+                            siteId: siteId
+                        }
+                    })];
+            case 2:
+                existingSubscription = _b.sent();
+                if (existingSubscription) {
+                    return [2 /*return*/, res.status(400).json({ message: 'User is already subscribed to this site' })];
+                }
+                return [4 /*yield*/, db_1.db.subscriptions.create({
+                        data: {
+                            userId: userId,
+                            siteId: siteId,
+                            isActive: true
+                        }
+                    })];
+            case 3:
+                newSubscription = _b.sent();
+                return [2 /*return*/, res.status(200).json({ message: 'Subscription successful', subscription: newSubscription })];
+            case 4:
+                error_2 = _b.sent();
+                return [2 /*return*/, res.status(500).json({ message: error_2.message })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.subscribeToSite = subscribeToSite;
+var unsubscribeFromSite = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, userId, siteId, existingSubscription, error_3;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, userId = _a.userId, siteId = _a.siteId;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, db_1.db.subscriptions.findFirst({
+                        where: {
+                            userId: userId,
+                            siteId: siteId
+                        }
+                    })];
+            case 2:
+                existingSubscription = _b.sent();
+                if (!existingSubscription) {
+                    return [2 /*return*/, res.status(400).json({ message: 'User is not subscribed to this site' })];
+                }
+                // Update the subscription to set isActive to false
+                return [4 /*yield*/, db_1.db.subscriptions.update({
+                        where: {
+                            id: existingSubscription.id
+                        },
+                        data: {
+                            isActive: false
+                        }
+                    })];
+            case 3:
+                // Update the subscription to set isActive to false
+                _b.sent();
+                return [2 /*return*/, res.status(200).json({ message: 'Unsubscription successful' })];
+            case 4:
+                error_3 = _b.sent();
+                return [2 /*return*/, res.status(500).json({ message: error_3.message })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.unsubscribeFromSite = unsubscribeFromSite;
