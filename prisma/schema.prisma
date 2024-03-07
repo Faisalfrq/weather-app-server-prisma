@@ -4,28 +4,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
 }
 
 model Administrator {
   id            String         @id @default(cuid())
-  name          String?
+  fullName      String
   username      String?
-  password      String?
+  password      String
   isActive      Boolean        @default(true)
   isDeleted     Boolean        @default(false)
-  sms_number    String?        @unique
-  email         String?        @unique
-  emailVerified DateTime?
-  image         String?
+  phone_number  String         @unique
+  email         String         @unique
+  emailVerified Boolean?       @default(false)
+  imageUrl      String?
   organization  String?
+  designation   String?
   roleId        String?
   role          Role?          @relation(fields: [roleId], references: [id])
   Account       Account[]
@@ -90,7 +86,7 @@ model Site {
 
 model Subscriptions {
   id        String   @id @default(uuid())
-  isActive  Boolean  @default(true)
+  isActive  Boolean
   siteId    String? // Optional site_id field
   site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   userId    String? // Optional id field
