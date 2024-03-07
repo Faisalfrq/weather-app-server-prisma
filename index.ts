@@ -2,12 +2,17 @@ import express, { Request, Response } from "express";
 import http from "http";
 import socketIO from "socket.io";
 import bodyParser from "body-parser";
+import cors from "cors"
 
 const routes = require("./src/controllers");
 
 const app = express();
 const PORT = process.env.PORT || 3002;
-
+const corsOptions = {
+  methods: ["GET, PUT, POST, DELETE"],
+  origin: [ "http://localhost:3000"],
+  optionsSuccessStatus: 204, // * some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 // Create HTTP server
 const server = http.createServer(app);
 
@@ -17,6 +22,7 @@ const io = new socketIO.Server(server);
 // Set the request size limit to 1 MB
 app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors(corsOptions));
 
 // Define your routes
 app.use(routes());

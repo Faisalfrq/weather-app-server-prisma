@@ -75,7 +75,7 @@ const pollForNotificationsAndEmit = async () => {
 
       // Emit the latest new notification to all clients
       io.emit('notifications', newNotifications);
-      // console.log('New notification emitted:', newNotifications[0]);
+      console.log('New notification emitted:', newNotifications[0]);
     }
   } catch (error) {
     console.error('Error while polling for notifications:', error);
