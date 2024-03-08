@@ -6,13 +6,12 @@ import jwt, { Secret } from "jsonwebtoken"
 const staticOTP = "123456"; // Static 6-digit OTP for testing
 
 // Map to store pending signups awaiting OTP confirmation
-const pendingSignUps: Record<string, { sms_number: string }> = {};
+const pendingSignUps: Record<string, { phone_number: string }> = {};
 
 // Function to simulate OTP generation and sending
 const generateOTP = async (contact: string) => {
     // In a real scenario, you'd generate a random OTP and send it via SMS or email
     // For testing purposes, we'll use a static OTP
-    console.log(`OTP generated and sent to ${contact}: ${staticOTP}`);
 };
 
 // Function to generate JWT token
@@ -23,17 +22,17 @@ const generateToken = (userId: string) => {
 
 // Function to handle user sign-up request
 export const signUp = async (req: Request, res: Response) => {
-    const { sms_number } = req.body;
+    const { phone_number } = req.body;
 
     try {
-        await generateOTP(sms_number);
-        const existingUser = await db.user.findUnique({ where: { sms_number } });
+        await generateOTP(phone_number);
+        const existingUser = await db.user.findUnique({ where: { phone_number } });
         if (existingUser) {
             // User already exists
             return res.status(200).json({ message: "You already have an account, confirm otp and continue" });
         }
 
-        pendingSignUps[sms_number] = { sms_number };
+        pendingSignUps[phone_number] = { phone_number };
 
         // New signup
         return res.status(200).json({ message: "OTP has been sent to your mobile number. Please confirm OTP to complete signup." });
@@ -45,10 +44,10 @@ export const signUp = async (req: Request, res: Response) => {
 
 // Function to handle OTP confirmation and complete signup process
 export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
-    const { sms_number, otp } = req.body;
+    const { phone_number, otp } = req.body;
 
     try {
-        const existingUser = await db.user.findUnique({ where: { sms_number } });
+        const existingUser = await db.user.findUnique({ where: { phone_number } });
         if (existingUser) {
             if (otp !== staticOTP) {
                 return res.status(400).json({ message: "Invalid OTP" });
@@ -61,7 +60,7 @@ export const confirmOTPAndSignUp = async (req: Request, res: Response) => {
         }
         const newUser = await db.user.create({
             data: {
-                sms_number,
+                phone_number,
                 isActive: true
             }
         });

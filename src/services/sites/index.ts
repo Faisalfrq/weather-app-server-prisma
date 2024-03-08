@@ -15,7 +15,7 @@ export const subscribeToSite = async (req: Request, res: Response) => {
 
   try {
     // Check if the subscription already exists
-    const existingSubscription = await db.subscriptions.findFirst({
+    const existingSubscription = await db.subscription.findFirst({
       where: {
         userId: userId,
         siteId: siteId
@@ -27,7 +27,7 @@ export const subscribeToSite = async (req: Request, res: Response) => {
     }
 
     // Create the new subscription
-    const newSubscription = await db.subscriptions.create({
+    const newSubscription = await db.subscription.create({
       data: {
         userId: userId,
         siteId: siteId,
@@ -46,7 +46,7 @@ export const unsubscribeFromSite = async (req: Request, res: Response) => {
 
   try {
     // Check if the subscription exists
-    const existingSubscription = await db.subscriptions.findFirst({
+    const existingSubscription = await db.subscription.findFirst({
       where: {
         userId: userId,
         siteId: siteId
@@ -58,7 +58,7 @@ export const unsubscribeFromSite = async (req: Request, res: Response) => {
     }
 
     // Update the subscription to set isActive to false
-    await db.subscriptions.update({
+    await db.subscription.update({
       where: {
         id: existingSubscription.id
       },

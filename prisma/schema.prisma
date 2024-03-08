@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,155 +11,182 @@ datasource db {
 }
 
 model Administrator {
-  id            String         @id @default(cuid())
+  id            String   @id @default(cuid())
   fullName      String
   username      String?
   password      String
-  isActive      Boolean        @default(true)
-  isDeleted     Boolean        @default(false)
-  phone_number  String         @unique
-  email         String         @unique
-  emailVerified Boolean?       @default(false)
-  imageUrl      String?
+  isActive      Boolean  @default(true)
+  isDeleted     Boolean  @default(false)
+  phone_number  String   @unique
+  email         String   @unique
+  emailVerified Boolean? @default(false)
   organization  String?
   designation   String?
-  roleId        String?
-  role          Role?          @relation(fields: [roleId], references: [id])
-  Account       Account[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  Notification  Notification[]
-}
+  imageUrl      String?
 
-model Account {
-  id                String        @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?       @db.Text
-  access_token      String?       @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?       @db.Text
-  session_state     String?
-  user              Administrator @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: NoAction)
 
-  @@unique([provider, providerAccountId])
+  Session Session[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Notification Notification[]
 }
 
 model Role {
-  id             String          @id @default(uuid())
-  name           String
-  administrators Administrator[] // One-to-many relationship
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-}
+  id           String          @id @default(uuid())
+  name         String
+  Adminstrator Administrator[]
 
-model SiteType {
-  id        String   @id @default(uuid())
-  name      String
-  Site      Site[] // One-to-many relationship
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Site {
-  id            String          @id @default(uuid())
-  name          String
-  latitude      Float
-  longitude     Float
-  altitude      Float
-  city          String
-  district      String
-  province      String
-  country       String
-  typeId        String?
-  type          SiteType?       @relation(fields: [typeId], references: [id])
-  subscriptions Subscriptions[]
-  alertLogs     AlertLogs[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+model Session {
+  id                String    @id @default(cuid())
+  type              String    @default("ADMIN")
+  provider          String
+  providerAccountId String
+  refresh_token     String?   @db.Text
+  access_token      String?   @db.Text
+  expires_at        DateTime?
+
+  adminId String
+  admin   Administrator @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
 }
 
-model Subscriptions {
-  id        String   @id @default(uuid())
-  isActive  Boolean
-  siteId    String? // Optional site_id field
-  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  userId    String? // Optional id field
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Site {
+  id        String @id @default(uuid())
+  name      String
+  latitude  Float
+  longitude Float
+  altitude  Float
+  city      String
+  district  String
+  province  String
+  country   String
+
+  siteTypeId String
+  siteType   SiteType @relation(fields: [siteTypeId], references: [id], onDelete: NoAction)
+
+  User         User[]
+  Subscription Subscription[]
+  alertLogs    AlertLogs[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteType {
+  id   String @id @default(uuid())
+  name String
+  Site Site[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id       String  @id @default(uuid())
+  isActive Boolean
+
+  siteId String? // Optional site_id field
+  site   Site?   @relation(fields: [siteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userId String? // Optional id field
+  user   User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(uuid())
   name          String?
-  sms_number    String          @unique
-  email         String?         @unique
+  phone_number  String    @unique
+  email         String?   @unique
   emailVerified DateTime?
-  image         String?
-  isActive      Boolean         @default(true)
+  password      String?
+  imageUrl      String?
   designation   String?
   organization  String?
-  Subscriptions Subscriptions[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  Notification  Notification[]
+  isActive      Boolean   @default(true)
+  isDeleted     Boolean   @default(false)
+
+  siteId String?
+  site   Site?   @relation(fields: [siteId], references: [id], onDelete: NoAction)
+
+  Subscription Subscription[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Notification Notification[]
 }
 
 model AlertLogs {
-  id           String         @id @default(uuid())
-  message      String
-  alertTypeId  String
-  alertType    AlertType      @relation(fields: [alertTypeId], references: [id])
-  siteId       String?
-  site         Site?          @relation(fields: [siteId], references: [id])
+  id      String @id @default(uuid())
+  message String
+
+  alertTypeId String
+  alertType   AlertType @relation(fields: [alertTypeId], references: [id])
+
+  siteId String?
+  site   Site?   @relation(fields: [siteId], references: [id])
+
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   Notification Notification[]
 }
 
 model AlertType {
-  id        String      @id @default(uuid())
-  name      String
+  id   String @id @default(uuid())
+  name String
+
   alertLogs AlertLogs[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EmailTemplate {
-  id        String   @id @default(uuid())
-  name      String
-  subject   String
-  message   String
+  id      String @id @default(uuid())
+  name    String
+  message String
+  subject String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model MessageTemplate {
-  id        String   @id @default(uuid())
-  name      String
-  message   String
+  id      String @id @default(uuid())
+  name    String
+  message String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Notification {
-  id            String         @id @default(uuid())
+  id            String  @id @default(uuid())
   title         String
   redirect_page String?
-  isRead        Boolean        @default(false)
-  alertId       String?
-  alertLog      AlertLogs?     @relation(fields: [alertId], references: [id])
-  userId        String?
-  user          User?          @relation(fields: [userId], references: [id])
-  adminId       String?
-  admin         Administrator? @relation(fields: [adminId], references: [id])
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  isRead        Boolean @default(false)
+
+  alertId  String?
+  alertLog AlertLogs? @relation(fields: [alertId], references: [id])
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  adminId String?
+  admin   Administrator? @relation(fields: [adminId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
