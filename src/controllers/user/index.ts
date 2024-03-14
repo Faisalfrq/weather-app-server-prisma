@@ -9,6 +9,7 @@ import { getUserById } from "./auth/getUserById";
 import userMiddleware from "../../middlewares/user.auth";
 import { getUsers } from "../../services/auth";
 import { updateNotificationById } from "./notifications/updateNotification";
+import { getUserSubscriptions } from "./sites/getSubscriptions";
 const routes = express.Router();
 
 module.exports = () => {
@@ -17,8 +18,9 @@ module.exports = () => {
   routes.get("/user-by-id",userMiddleware, getUserById);
   routes.get("/users", getUsers);
   routes.get("/site",userMiddleware, getSites);
-  routes.post("/subscribe", subscribeSite);
-  routes.post("/unsubscribe", unsubscribeSite);
+  routes.get("/user-subscriptions",userMiddleware, getUserSubscriptions);
+  routes.post("/subscribe",userMiddleware, subscribeSite);
+  routes.put("/unsubscribe",userMiddleware, unsubscribeSite);
   routes.get("/notifications",userMiddleware, getNotifications);
   routes.put("/notifications",userMiddleware, updateNotificationById);
   return routes;

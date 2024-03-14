@@ -16,9 +16,13 @@ const generateOTP = async (contact: string) => {
 
 // Function to generate JWT token
 const generateToken = (userId: string) => {
-    return jwt.sign({ userId }, process.env.USER_SECRET as Secret, { expiresIn: '12h' });
-};
+    // Calculate expiry time for 2 months from now
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 2);
 
+    // Generate the token with expiresIn option set to 2 months
+    return jwt.sign({ userId }, process.env.USER_SECRET as Secret, { expiresIn: expiryDate.getTime() });
+};
 
 // Function to handle user sign-up request
 export const signUp = async (req: Request, res: Response) => {
