@@ -14,6 +14,7 @@ var getUserById_1 = require("./auth/getUserById");
 var user_auth_1 = __importDefault(require("../../middlewares/user.auth"));
 var auth_1 = require("../../services/auth");
 var updateNotification_1 = require("./notifications/updateNotification");
+var getSubscriptions_1 = require("./sites/getSubscriptions");
 var routes = express_1.default.Router();
 module.exports = function () {
     routes.post("/auth/register", registerUser_1.registerUser);
@@ -21,8 +22,9 @@ module.exports = function () {
     routes.get("/user-by-id", user_auth_1.default, getUserById_1.getUserById);
     routes.get("/users", auth_1.getUsers);
     routes.get("/site", user_auth_1.default, getSites_1.getSites);
-    routes.post("/subscribe", subscribe_1.subscribeSite);
-    routes.post("/unsubscribe", unsubscribe_1.unsubscribeSite);
+    routes.get("/user-subscriptions", user_auth_1.default, getSubscriptions_1.getUserSubscriptions);
+    routes.post("/subscribe", user_auth_1.default, subscribe_1.subscribeSite);
+    routes.put("/unsubscribe", user_auth_1.default, unsubscribe_1.unsubscribeSite);
     routes.get("/notifications", user_auth_1.default, getNotifications_1.getNotifications);
     routes.put("/notifications", user_auth_1.default, updateNotification_1.updateNotificationById);
     return routes;

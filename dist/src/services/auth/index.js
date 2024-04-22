@@ -49,39 +49,46 @@ var pendingSignUps = {};
 // Function to simulate OTP generation and sending
 var generateOTP = function (contact) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        // In a real scenario, you'd generate a random OTP and send it via SMS or email
-        // For testing purposes, we'll use a static OTP
-        console.log("OTP generated and sent to ".concat(contact, ": ").concat(staticOTP));
         return [2 /*return*/];
     });
 }); };
 // Function to generate JWT token
 var generateToken = function (userId) {
-    return jsonwebtoken_1.default.sign({ userId: userId }, process.env.USER_SECRET, { expiresIn: '12h' });
+    // Calculate expiry time for 2 months from now
+    var expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 2);
+    // Generate the token with expiresIn option set to 2 months
+    return jsonwebtoken_1.default.sign({ userId: userId }, process.env.USER_SECRET, {
+        expiresIn: expiryDate.getTime(),
+    });
 };
 // Function to handle user sign-up request
 var signUp = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var sms_number, existingUser, error_1;
+    var phone_number, existingUser, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                sms_number = req.body.sms_number;
+                phone_number = req.body.phone_number;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 4, , 5]);
-                return [4 /*yield*/, generateOTP(sms_number)];
+                return [4 /*yield*/, generateOTP(phone_number)];
             case 2:
                 _a.sent();
-                return [4 /*yield*/, db_1.db.user.findUnique({ where: { sms_number: sms_number } })];
+                return [4 /*yield*/, db_1.db.user.findUnique({ where: { phone_number: phone_number } })];
             case 3:
                 existingUser = _a.sent();
                 if (existingUser) {
                     // User already exists
-                    return [2 /*return*/, res.status(200).json({ message: "You already have an account, confirm otp and continue" })];
+                    return [2 /*return*/, res.status(200).json({
+                            message: "You already have an account, confirm otp and continue",
+                        })];
                 }
-                pendingSignUps[sms_number] = { sms_number: sms_number };
+                pendingSignUps[phone_number] = { phone_number: phone_number };
                 // New signup
-                return [2 /*return*/, res.status(200).json({ message: "OTP has been sent to your mobile number. Please confirm OTP to complete signup." })];
+                return [2 /*return*/, res.status(200).json({
+                        message: "OTP has been sent to your mobile number. Please confirm OTP to complete signup.",
+                    })];
             case 4:
                 error_1 = _a.sent();
                 return [2 /*return*/, res.status(500).json({ message: error_1.message })];
@@ -92,15 +99,20 @@ var signUp = function (req, res) { return __awaiter(void 0, void 0, void 0, func
 exports.signUp = signUp;
 // Function to handle OTP confirmation and complete signup process
 var confirmOTPAndSignUp = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, sms_number, otp, existingUser, token_1, newUser, token, error_2;
+    var _a, phone_number, otp, existingUser, token_1, newUser, token, error_2;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, sms_number = _a.sms_number, otp = _a.otp;
+                _a = req.body, phone_number = _a.phone_number, otp = _a.otp;
                 _b.label = 1;
             case 1:
                 _b.trys.push([1, 4, , 5]);
-                return [4 /*yield*/, db_1.db.user.findUnique({ where: { sms_number: sms_number } })];
+                if (!phone_number || !otp) {
+                    return [2 /*return*/, res
+                            .status(400)
+                            .json({ message: "Phone number and OTP are required" })];
+                }
+                return [4 /*yield*/, db_1.db.user.findUnique({ where: { phone_number: phone_number } })];
             case 2:
                 existingUser = _b.sent();
                 if (existingUser) {
@@ -115,14 +127,16 @@ var confirmOTPAndSignUp = function (req, res) { return __awaiter(void 0, void 0,
                 }
                 return [4 /*yield*/, db_1.db.user.create({
                         data: {
-                            sms_number: sms_number,
-                            isActive: true
-                        }
+                            phone_number: phone_number,
+                            isActive: true,
+                        },
                     })];
             case 3:
                 newUser = _b.sent();
                 token = generateToken(newUser.id);
-                return [2 /*return*/, res.status(201).json({ message: "User created successfully", token: token })];
+                return [2 /*return*/, res
+                        .status(201)
+                        .json({ message: "User created successfully", token: token })];
             case 4:
                 error_2 = _b.sent();
                 return [2 /*return*/, res.status(500).json({ message: error_2.message })];
